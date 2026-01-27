@@ -1,1 +1,4 @@
-.key
+build/
+install/
+log/
+COLCON_IGNORE

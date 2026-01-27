@@ -1,0 +1,9 @@
+<library path="openrst_control_lib">
+  <class name="openrst_control/OpenRSTSystemHardware"
+         type="openrst_control::OpenRSTSystemHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      The OpenRST system hardware interface.
+    </description>
+  </class>
+</library>

@@ -1,86 +1,81 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.8)
 project(openrst_control)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  std_msgs
-  geometry_msgs
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(controller_manager REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(mc_daq_ros REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+# Generate Interfaces
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/OpenrstRequest.srv"
+  DEPENDENCIES std_msgs
+)
+
+# Include directories
+include_directories(
+  include
+  ${EIGEN3_INCLUDE_DIRS}
+)
+
+# Typesupport target for generated interfaces
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+
+# Libraries
+add_library(${PROJECT_NAME}_lib SHARED
+  src/openrst_control.cpp
+  src/openrst_system.cpp
+)
+target_link_libraries(${PROJECT_NAME}_lib "${cpp_typesupport_target}" Eigen3::Eigen)
+ament_target_dependencies(${PROJECT_NAME}_lib
+  rclcpp
   sensor_msgs
+  geometry_msgs
+  std_msgs
+  trajectory_msgs
+  hardware_interface
   controller_manager
-  joint_limits_interface
-  message_generation
+  pluginlib
   mc_daq_ros
 )
-## System dependencies are found with CMake's conventions
 
-include_directories (${PROJECT_BINARY_DIR})
+# Pluginlib
+pluginlib_export_plugin_description_file(hardware_interface openrst_control.xml)
 
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  openrst_request.srv
-)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-  sensor_msgs
-  geometry_msgs
-)
-
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
- INCLUDE_DIRS include
-CATKIN_DEPENDS message_runtime roscpp 
-)
-
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-include
-/usr/include/eigen3
-${catkin_INCLUDE_DIRS}
-)
-
-## Declare a C++ library
-add_library(${PROJECT_NAME}_lib
-  src/openrst_control.cpp
-)
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-add_dependencies(${PROJECT_NAME}_lib ${${PROJECT_NAME}_generate_messages} ${${PROJECT_NAME}_gencfg} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
+# Executables
 add_executable(openrst_control_node
   src/main.cpp
 )
+target_link_libraries(openrst_control_node ${PROJECT_NAME}_lib "${cpp_typesupport_target}")
+ament_target_dependencies(openrst_control_node rclcpp)
 
-## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_lib
- ${catkin_LIBRARIES}
- uldaq
-)
-target_link_libraries(openrst_control_node
+# Install
+install(TARGETS
   ${PROJECT_NAME}_lib
-  ${catkin_LIBRARIES}
+  openrst_control_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
+install(DIRECTORY include/
+  DESTINATION include/
+)
+
+install(DIRECTORY config launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME}_lib)
+ament_package()

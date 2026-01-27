@@ -2,6 +2,7 @@
 #define FILTERS_HEADER_GUARD
 
 #include <Eigen/Dense>
+#include <iostream>
 
 using namespace Eigen;
 
@@ -41,8 +42,7 @@ public:
     if (new_vec.size() == N_elements_) {
       MatrixXd::Map(&el_mat_(0, order_ - 1), N_elements_, 1) = new_vec;
     } else {
-      ROS_ERROR_STREAM(
-          "avg_filter: New vector dimentions doesnt match filter dimensions");
+      std::cerr << "avg_filter: New vector dimensions don't match filter dimensions" << std::endl;
       return;
     }
     // ROS_INFO_STREAM(" Mat Filter: " << el_mat_);
@@ -125,11 +125,8 @@ public:
 
   void addX(VectorXd new_vec)
   {
-    if (new_vec.size() == N_elements_) {
-      MatrixXd::Map(&Xmat_(0, 0), N_elements_, 1) = new_vec;
     } else {
-      ROS_ERROR_STREAM(
-          "filter: New vector dimentions doesnt match filter dimensions");
+      std::cerr << "filter: New vector dimensions don't match filter dimensions" << std::endl;
       return;
     }
     // ROS_INFO_STREAM(" X Mat Filter: " << Xmat_);
@@ -140,8 +137,7 @@ public:
     if (new_vec.size() == N_elements_) {
       MatrixXd::Map(&Ymat_(0, 0), N_elements_, 1) = new_vec;
     } else {
-      ROS_ERROR_STREAM(
-          "filter: New vector dimentions doesnt match filter dimensions");
+      std::cerr << "filter: New vector dimensions don't match filter dimensions" << std::endl;
       return;
     }
     // ROS_INFO_STREAM(" Y Mat Filter: " << Ymat_);

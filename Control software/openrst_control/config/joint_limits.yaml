@@ -1,5 +1,5 @@
 joint_limits:
-  joint_f0_pitch:
+  joint_pitch:
     has_position_limits: true
     min_position: -1.5
     max_position: 1.5
@@ -9,7 +9,7 @@ joint_limits:
     max_acceleration: 5.0
     has_effort_limits: true
     max_effort: 6
-  joint_f1_finger_left:
+  joint_finger_left:
     has_position_limits: true
     min_position: -1.65
     max_position: 1.65
@@ -19,7 +19,7 @@ joint_limits:
     max_acceleration: 5.0
     has_effort_limits: true
     max_effort: 8
-  joint_f2_finger_right:
+  joint_finger_right:
     has_position_limits: true
     min_position: -1.65
     max_position: 1.65

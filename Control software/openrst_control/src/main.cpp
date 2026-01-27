@@ -1,9 +1,5 @@
 #include <openrst_control/openrst_control.h>
-
-// C
-#include <signal.h>
-
-// C++
+#include <rclcpp/rclcpp.hpp>
 #include <thread>
 
 using namespace openrst_nu;
@@ -12,27 +8,32 @@ bool kill_this_process = false;
 
 void SigIntHandler(int signal)
 {
+  (void)signal;
   kill_this_process = true;
-  ROS_WARN_STREAM("SHUTDOWN SIGNAL RECEIVED");
-  ros::shutdown();
+  rclcpp::shutdown();
 }
 
 int main(int argc, char **argv)
 {
-  // Ros related
-  ros::init(argc, argv, "openrst_control");
-  ros::NodeHandle node_handle;
+  rclcpp::init(argc, argv);
   signal(SIGINT, SigIntHandler);
 
-  OpenRSTControl orst(node_handle, &kill_this_process);
+  auto orst_node = std::make_shared<OpenRSTControl>("openrst_control", &kill_this_process);
 
-  ros::AsyncSpinner spinner(3);
-  spinner.start();
+  // Use a multithreaded executor to handle callbacks while running the control loop
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(orst_node);
 
-  std::thread t(std::bind(&OpenRSTControl::ControlLoop, &orst));
+  std::thread t_executor([&executor]() {
+      executor.spin();
+  });
 
-  t.join();
-  spinner.stop();
+  orst_node->ControlLoop();
+
+  if (t_executor.joinable()) {
+      executor.cancel();
+      t_executor.join();
+  }
 
   return 0;
 }

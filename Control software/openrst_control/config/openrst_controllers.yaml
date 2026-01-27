@@ -1,0 +1,16 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    effort_controller:
+      type: effort_controllers/JointGroupEffortController
+
+effort_controller:
+  ros__parameters:
+    joints:
+      - joint_pitch
+      - joint_finger_left
+      - joint_finger_right

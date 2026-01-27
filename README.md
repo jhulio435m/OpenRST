@@ -61,9 +61,40 @@ The drive unit houses the motors, gearing, and control board.
 
 ### Software
 
-The control system is built on the Robot Operating System (ROS). We provide two main packages:
+The control system has been upgraded to **ROS 2 (Jazzy Jalisco)** running on **Ubuntu 24.04 LTS (Noble Numbat)**. This marks a major migration from the previous ROS 1 based system, leveraging the improved real-time capabilities and modern architecture of ROS 2.
+
+We provide three main packages:
 *   `mc_daq_ros`: Handles communication with the Measurement Computing DAQ boards.
-*   `openrst_control`: The main control node, which uses `ros_control`.
+*   `openrst_control`: The main control node, compatible with `ros2_control`.
+*   `openrst_description`: Contains the URDF description and meshes for the robot.
+
+#### Installation & Build
+
+To set up the OpenRST software stack:
+
+1.  **Prerequisites:**
+    *   Ubuntu 24.04 LTS (Noble Numbat)
+    *   ROS 2 Jazzy Jalisco
+
+2.  **Build the Workspace:**
+    ```bash
+    # Create a workspace (if you haven't already)
+    mkdir -p ~/openrst_ws/src
+    cd ~/openrst_ws/src
+    
+    # Clone the repository
+    git clone https://github.com/jcolan/OpenRST.git .
+
+    # Install dependencies (optional but recommended)
+    cd ~/openrst_ws
+    rosdep install --from-paths src --ignore-src -r -y
+
+    # Build the packages
+    colcon build --symlink-install
+    
+    # Source the setup script
+    source install/setup.bash
+    ```
 
 <img src="img/controller_framework.png" alt="Controller Framework" width="400" style="background-color:white;"/>
 
@@ -183,7 +214,7 @@ The OpenRST platform has been used in various research projects. Here are a few 
 
 We are continuously working to improve the OpenRST platform. Our current focus is:
 
-*   **Migrating to ROS2:** We are in the process of updating the control software to be compatible with ROS2, bringing more stability, security, and performance to the platform.
+*   **Refining ROS 2 Control:** Fine-tuning the hardware interface for better performance and integration with different DAQ boards.
 
 ## License
 

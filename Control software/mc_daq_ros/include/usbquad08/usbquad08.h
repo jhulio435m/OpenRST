@@ -1,31 +1,34 @@
+#ifndef USBQUAD08_H
+#define USBQUAD08_H
 
 // C
 #include <stdio.h>
 #include <stdlib.h>
 
 // C++
+#include <vector>
+#include <string>
+#include <memory>
 
 // External
 #include "uldaq.h"
 #include <ul_lib/utility.h>
-#include <ros/ros.h>
-#include <std_msgs/Int32MultiArray.h>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32_multi_array.hpp>
 
 // Internal
-#include <mc_daq_ros/daq_cmd.h>
+#include <mc_daq_ros/srv/daq_cmd.hpp>
 
 class USBQUAD08
 {
-
   const int kNumberOfEncChannels = 8;
 
 public:
-  USBQUAD08();
-  USBQUAD08(ros::NodeHandle nh, std::string daq_id);
+  USBQUAD08(std::shared_ptr<rclcpp::Node> nh, std::string daq_id);
   ~USBQUAD08();
 
-  bool SrvDaqCommandCb(mc_daq_ros::daq_cmd::Request &req,
-                       mc_daq_ros::daq_cmd::Response &res);
+  void SrvDaqCommandCb(const std::shared_ptr<mc_daq_ros::srv::DaqCmd::Request> req,
+                       std::shared_ptr<mc_daq_ros::srv::DaqCmd::Response> res);
 
   int InitENC();
   int SetZero(int enc_id);
@@ -50,13 +53,13 @@ public:
 
 private:
   // ROS
-  ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Node> nh_;
 
   // ROS Topics
-  ros::Publisher pub_enc_state_;
-  std_msgs::Int32MultiArray pub_enc_state_msg_;
+  rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr pub_enc_state_;
+  std_msgs::msg::Int32MultiArray pub_enc_state_msg_;
 
-  ros::ServiceServer srv_server_daq_cmd;
+  rclcpp::Service<mc_daq_ros::srv::DaqCmd>::SharedPtr srv_server_daq_cmd;
 
   // Device
   int descriptorIndex_;
@@ -91,3 +94,5 @@ private:
 
   int offset_;
 };
+
+#endif // USBQUAD08_H
