@@ -125,6 +125,8 @@ public:
 
   void addX(VectorXd new_vec)
   {
+    if (new_vec.size() == N_elements_) {
+      MatrixXd::Map(&Xmat_(0, 0), N_elements_, 1) = new_vec;
     } else {
       std::cerr << "filter: New vector dimensions don't match filter dimensions" << std::endl;
       return;
