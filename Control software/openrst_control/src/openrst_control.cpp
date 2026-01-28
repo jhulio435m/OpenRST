@@ -1,6 +1,8 @@
 #include <openrst_control/openrst_control.h>
 #include <unistd.h>
 
+#include <algorithm>
+
 namespace openrst_nu
 {
   OpenRSTControl::OpenRSTControl(const std::string & node_name, bool *kill_this_node)
